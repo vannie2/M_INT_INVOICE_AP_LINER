@@ -518,12 +518,8 @@ namespace INT
             aTextEdit_InvoiceNo.Text = aTextEdit_VendorInvNo.Text;            
             aDateEdit_TM_INVOICE_RECEIVED.Text = A.GetToday;
 
-            //2020.10.16 HYJ EU AP 관리 개선 -> INV DATE, DUE DATE 입력 제거 
-            if (Global.BizCode == "TYO" || Global.BizCode == "LAX" || Global.BizCode == "CHI" || Global.BizCode == "NYC")
-            {
-                aDateEdit_DueDate.Text = aDateEdit_VendorDueDate.Text;
-                aDateEdit_InvoiceDate.Text = aDateEdit_VendorReceivedDate.Text;
-            }
+            aDateEdit_DueDate.Text = aDateEdit_VendorDueDate.Text;
+            aDateEdit_InvoiceDate.Text = aDateEdit_VendorReceivedDate.Text;
 
             if (Global.BizCode == "TYO") return;
 
@@ -3291,22 +3287,23 @@ namespace INT
             //18.07.10 - KJH 구분 가능한 REQUEST NO.도 채번 할 것 (NO_INVOICE_AP)
             string noInvoiceAp = A.GetSlipNoNew(Global.BizCode, "INT", 15);
 
-            //2020.10.16 HYJ - Invoice Date, Due Date 입력창 추가
-            POPUP_PAYMENT_REQUEST pop = new POPUP_PAYMENT_REQUEST(aCodeText_Vendor.CodeValue, aDateEdit_InvoiceDate.Text, aDateEdit_DueDate.Text);
+            //2020.11.25 LHJ - 팝업창 제거
+            ////2020.10.16 HYJ - Invoice Date, Due Date 입력창 추가
+            //POPUP_PAYMENT_REQUEST pop = new POPUP_PAYMENT_REQUEST(aCodeText_Vendor.CodeValue, aDateEdit_InvoiceDate.Text, aDateEdit_DueDate.Text);
 
-            if (pop.ShowDialog() == DialogResult.OK)
-            {
-                string[] rtn = A.GetString(pop.ReturnData["ReturnData"]).Split('/');
+            //if (pop.ShowDialog() == DialogResult.OK)
+            //{
+            //    string[] rtn = A.GetString(pop.ReturnData["ReturnData"]).Split('/');
 
-                if (rtn == null) return;
+            //    if (rtn == null) return;
 
-                tmInvoice = rtn[0];
-                tmInvoiceDue = rtn[1];
-            }
-            else
-            {
-                throw new Exception("You canceled it.");
-            }
+            //    tmInvoice = rtn[0];
+            //    tmInvoiceDue = rtn[1];
+            //}
+            //else
+            //{
+            //    throw new Exception("You canceled it.");
+            //}
 
             object[] obj = new object[]
             {
