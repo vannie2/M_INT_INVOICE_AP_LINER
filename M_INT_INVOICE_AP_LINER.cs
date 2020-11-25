@@ -86,6 +86,8 @@ namespace INT
 
         public void InitLoad()
         {
+            Console.WriteLine("abc");
+        
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", Application.StartupPath + @"/aif-ocr-3b4468d50e67.json");
 
             DirectoryInfo di = new DirectoryInfo(path);
