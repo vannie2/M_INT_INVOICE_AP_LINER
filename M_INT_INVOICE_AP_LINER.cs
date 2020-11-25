@@ -286,6 +286,18 @@ namespace INT
         #endregion
 
         #region ▶ Main button Event
+        
+        public override void OnView()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                HandleWinException(ex);
+            }
+        }
 
         public override void OnInsert()
         {
@@ -293,6 +305,55 @@ namespace INT
             {
                 InitializeHeader();
                 MenuKey = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                HandleWinException(ex);
+            }
+        }
+        
+        public override void OnDelete()
+        {
+            try
+            {
+                if (ShowMessageBoxA("Do you really want to delete this?", MessageType.Question) != DialogResult.Yes)
+                    return;
+
+                if (_HEADER.CurrentRow.RowState == DataRowState.Added)
+                {
+                    InitializeHeader();
+                    return;
+                }
+
+                object[] obj = new object[] { Global.FirmCode,
+                                              A.GetString(_HEADER.CurrentRow["CD_BIZ"]),
+                                              A.GetString(_HEADER.CurrentRow["NO_SLIP_INVOICE"]) };
+
+                /*
+                 * 2016.11.10 - KJH
+                 * 삭제 전 체크
+                 * P : 정산이 되었으면 삭제 불가
+                 * C : CLOSE 상태 삭제 불가
+                 * O : 삭제 가능
+                 */
+                string result = DBHelper.ExecuteScalar("AP_INT_INVOICE_CHECK_S", obj) as string;
+
+                if (result == "P")
+                {
+                    ShowMessageBoxA("This Invoice has been paid.", MessageType.Warning);
+                    return;
+                }
+                else if (result == "C")
+                {
+                    ShowMessageBoxA("This Invoice was closed.", MessageType.Warning);
+                    return;
+                }
+
+                if (_D.Delete(obj))
+                {
+                    ShowMessageBoxA("It was successfully deleted.", MessageType.Information);
+                    InitializeHeader();
+                }
             }
             catch (Exception ex)
             {
@@ -317,6 +378,134 @@ namespace INT
                 {
                     DoSave();
                 }
+            }
+            catch (Exception ex)
+            {
+                HandleWinException(ex);
+            }
+        }
+        
+                public override void OnSave()
+        {
+            try
+            {
+                if (!BeforeSave()) return;
+
+                if (!string.IsNullOrEmpty(_noInvoiceAp))
+                {
+                    if (ShowMessageBoxA("AP was already Issued.\n\r Do you want to create AP?", MessageType.Question) == DialogResult.Yes)
+                    {
+                        DoSave();
+                    }
+                }
+                else
+                {
+                    DoSave();
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleWinException(ex);
+            }
+        }
+
+        public override void OnModuleFile()
+        {
+            base.OnModuleFile();
+
+            try
+            {
+                // FG_MEMO, NO_SLIP_REL
+                string _noSlipRel = A.GetString(_HEADER.CurrentRow["NO_SLIP_INVOICE"]);
+                if (_noSlipRel != string.Empty)
+                {
+                    object[] obj = {
+                        "INV",
+                        _noSlipRel
+                    };
+                    POPUP_FILE pop = new POPUP_FILE(obj);
+                    pop.Show();
+                }
+                else
+                {
+                    ShowMessageBoxA("Can't open the File.", MessageType.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleWinException(ex);
+            }
+        }
+
+        public override void OnModuleMemo()
+        {
+            base.OnModuleMemo();
+
+            try
+            {
+                // FG_MEMO, NO_SLIP_REL
+                string _noSlipRel = A.GetString(_HEADER.CurrentRow["NO_SLIP_INVOICE"]);
+                if (_noSlipRel != string.Empty)
+                {
+                    object[] obj = {
+                        "INV",
+                        _noSlipRel
+                    };
+                    POPUP_MEMO pop = new POPUP_MEMO(obj);
+                    pop.ShowDialog();
+                }
+                else
+                {
+                    ShowMessageBoxA("Can't open the Memo.", MessageType.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleWinException(ex);
+            }
+        }
+
+        public override void OnHelpMenual()
+        {
+            try
+            {
+                base.OnHelpMenual();
+            }
+            catch (Exception ex)
+            {
+                HandleWinException(ex);
+            }
+        }
+
+        public override void OnMovePartner()
+        {
+            try
+            {
+                base.OnMovePartner();
+                MdiForm.CreateChildForm("MAS.M_MAS_PARTNER");
+            }
+            catch (Exception ex)
+            {
+                HandleWinException(ex);
+            }
+        }
+
+        public override void OnPrint()
+        {
+            try
+            {
+                DataRow row = _HEADER.CurrentRow;
+                string cdBiz = A.GetString(_HEADER.CurrentRow["CD_BIZ"]);
+                string fgInvoice = A.GetString(_HEADER.CurrentRow["FG_INVOICE"]);
+
+                string[] ReportFile = new string[1];
+                ReportFile[0] = "PAYMENT_REQUEST";
+
+                RptHelper.ReportView(ReportFile,
+                            new string[] { "P_CD_FIRM", "P_CD_BIZ", "P_CD_USER", "P_NO_SLIP_INVOICE" },
+                            new object[] { Global.FirmCode, cdBiz, Global.UserID, row["NO_SLIP_INVOICE"] });
+
+                _D.UpdateInvoicePrint(cdBiz, A.GetString(row["NO_SLIP_INVOICE"]));
             }
             catch (Exception ex)
             {
