@@ -2378,9 +2378,9 @@ namespace INT
                         {
                             string[] value = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
                             aTextEdit_VendorRefNo.Text = value[6];
-                            aTextEdit_VendorInvNo.Text = value[5];
+                            aTextEdit_VendorInvNo.Text = value[6];
                         }
-                        else if (temp[i].IndexOf("USD") != -1)
+                        else if (temp[i].IndexOf("U") == 0 && temp[i].IndexOf("S") == 1 && temp[i].IndexOf("D") == 2)
                         {
                             string[] value = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
                             aNumericText_TotalAmount.Text = value[1];
@@ -2401,17 +2401,13 @@ namespace INT
                     temp = pageText.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
                     for (int i = 0; i < temp.Length; i++)
                     {
-                        if (temp[i].IndexOf("LOE") != -1)
-                        {
-                            string[] value = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                            aTextEdit_VendorRefNo.Text = value[0];
-                        }
-                        else if (temp[i].IndexOf("SMLM") != -1)
+                        if (temp[i].IndexOf("SMLM") != -1)
                         {
                             string[] value = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
                             aTextEdit_VendorInvNo.Text = value[0];
+                            aTextEdit_VendorRefNo.Text = value[0];
                         }
-                        else if (temp[i].IndexOf("USD") != -1)
+                        else if (temp[i].IndexOf("USD") != -1 && temp[i].IndexOf("KRW") != -1)
                         {
                             string[] value = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
                             aNumericText_TotalAmount.Text = value[1];
