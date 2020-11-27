@@ -736,6 +736,15 @@ namespace INT
                 {
                     classifiedDocument = "namsung_vendor_invoice";
                 }
+                else if (text.Contains("YANG MING"))
+                {
+                    classifiedDocument = "yangming_vendor_invoice";
+                }
+                else if (text.Contains("SMLINE"))
+                {
+                    classifiedDocument = "smline_vendor_invoice";
+                }
+
                 Console.WriteLine(classifiedDocument);
 
                 for (int i = 1; i <= page; i++)
@@ -1414,9 +1423,11 @@ namespace INT
             }
             else if (Global.BizCode == "LAX" || Global.BizCode == "CHI" || Global.BizCode == "NYC")
             {
-                //EU
+                //US
                 _documentFrequency.Add("one_vendor_invoice", 0.0);
                 _documentFrequency.Add("hmm_vendor_invoice", 0.0);
+                _documentFrequency.Add("yangming_vendor_invoice", 0.0);
+                _documentFrequency.Add("smline_vendor_invoice", 0.0);
             }
             else
             {
@@ -1457,6 +1468,8 @@ namespace INT
                 //US
                 _keywords.Add("one_vendor_invoice", new string[] { "ONE", "OCEAN", "NETWORK", "EXPRESS" });
                 _keywords.Add("hmm_vendor_invoice", new string[] { "HDMU", "HMM" });
+                _keywords.Add("yangming_vendor_invoice", new string[] { "YANG", "MING" });
+                _keywords.Add("smline_vendor_invoice", new string[] { "SMLINE", "SMLM", "LOE" });
             }
             else
             {
@@ -2349,6 +2362,64 @@ namespace INT
                             aDateEdit_VendorDueDate.Text = PostValidCheck("DATE_JP", DateTime.Now.ToString("yyyyMMdd"));
                         }
                     }
+
+                    break;
+
+                #endregion
+
+                #region - yangming_vendor_invoice
+
+                case "yangming_vendor_invoice":
+
+                    temp = pageText.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 0; i < temp.Length; i++)
+                    {
+                        if (temp[i].IndexOf("ALLSTATE") != -1)
+                        {
+                            string[] value = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            aTextEdit_VendorRefNo.Text = value[6];
+                            aTextEdit_VendorInvNo.Text = value[5];
+                        }
+                        else if (temp[i].IndexOf("USD") != -1)
+                        {
+                            string[] value = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            aNumericText_TotalAmount.Text = value[1];
+                        }
+                    }
+
+                    aDateEdit_VendorReceivedDate.Text = DateTime.Now.ToString("yyyyMMdd");
+                    aDateEdit_VendorDueDate.Text = PostValidCheck("DATE_JP", DateTime.Now.ToString("yyyyMMdd"));
+
+                    break;
+
+                #endregion
+
+                #region - smline_vendor_invoice
+
+                case "smline_vendor_invoice":
+
+                    temp = pageText.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 0; i < temp.Length; i++)
+                    {
+                        if (temp[i].IndexOf("LOE") != -1)
+                        {
+                            string[] value = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            aTextEdit_VendorRefNo.Text = value[0];
+                        }
+                        else if (temp[i].IndexOf("SMLM") != -1)
+                        {
+                            string[] value = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            aTextEdit_VendorInvNo.Text = value[0];
+                        }
+                        else if (temp[i].IndexOf("USD") != -1)
+                        {
+                            string[] value = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                            aNumericText_TotalAmount.Text = value[1];
+                        }
+                    }
+
+                    aDateEdit_VendorReceivedDate.Text = DateTime.Now.ToString("yyyyMMdd");
+                    aDateEdit_VendorDueDate.Text = PostValidCheck("DATE_JP", DateTime.Now.ToString("yyyyMMdd"));
 
                     break;
 
